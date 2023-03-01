@@ -13,7 +13,6 @@ main {
     height: 55%;
     display: flex;
     justify-content: center;
-    border: 1px solid black;
 }
 
 .card-container {
@@ -23,8 +22,9 @@ main {
     display: grid;
     grid-template-columns: 1fr 1fr;
     grid-template-rows: 1fr 1fr;
-    grid-template-areas: "a b"
-                         "c d";
+    grid-template-areas:
+        "a b"
+        "c d";
     border: 1px solid black;
 }
 
@@ -52,6 +52,15 @@ main {
     background-color: darkcyan;
 }
 
+.card-pos-a,
+.card-pos-b,
+.card-pos-c,
+.card-pos-d {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
 .card {
     position: absolute;
     height: var(--card-height);
@@ -67,7 +76,8 @@ main {
     transform-style: preserve-3d;
 }
 
-.card-front, .card-back{
+.card-front,
+.card-back {
     position: absolute;
     width: 100%;
     height: 100%;
@@ -75,14 +85,18 @@ main {
     backface-visibility: hidden;
 }
 
-.card-img{
-    height:100%;
+.card-img {
+    height: 100%;
 }
 
-.card-back{
+.card-back {
     transform: rotateY(180deg);
 }
 
-.card:hover .card-inner{
+.card:hover .card-inner {
+    transform: rotateY(180deg);
+}
+
+.card-inner.flip-it {
     transform: rotateY(180deg);
 }
