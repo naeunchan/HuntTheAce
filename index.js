@@ -45,30 +45,54 @@ let maxRounds = 4;
 let score = 0;
 
 // functions
-const loadGame = () => {
+function loadGame() {
     createCards();
 
     cards = document.querySelectorAll(".card");
 
     playGameButtonElem.addEventListener("click", () => startGame());
-};
+}
 
-const chooseCard = (card) => {
+function gameOver() {
+    updateStatusElement(scoreContainerElem, "none");
+    updateStatusElement(roundContainerElem, "none");
+
+    const gameOverMessage = `Game Over! Final Score - <span class = "badge">${score}</span> Click 'Play Game' button to play again`;
+
+    updateStatusElement(currentGameStatusElem, "block", primaryColor, gameOverMessage);
+
+    gameInProgress = false;
+    playGameButtonElem.disabled = false;
+}
+
+function endRound() {
+    setTimeout(() => {
+        if (roundNum == maxRounds) {
+            gameOver();
+            return;
+        } else {
+            startRound();
+        }
+    }, 3000);
+}
+
+function chooseCard(card) {
     if (canChooseCard()) {
         evaluateCardChoice(card);
         flipCard(card, false);
 
         setTimeout(() => {
-            flipCard(false);
+            flipCards(false);
             updateStatusElement(currentGameStatusElem, "block", primaryColor, "Card positions revealed");
+
+            endRound();
         }, 3000);
 
         cardsRevealed = true;
-        // start 1:08:21
     }
-};
+}
 
-const calculateScoreToAdd = (roundNum) => {
+function calculateScoreToAdd(roundNum) {
     switch (roundNum) {
         case 1:
             return 100;
@@ -79,48 +103,49 @@ const calculateScoreToAdd = (roundNum) => {
         default:
             return10;
     }
-};
+}
 
-const calculateScore = () => {
+function calculateScore() {
     const scoreToAdd = calculateScoreToAdd(roundNum);
     score += scoreToAdd;
-};
+}
 
-const updateScore = () => {
+function updateScore() {
     calculateScore();
-};
+    updateStatusElement(scoreElem, "block", primaryColor, `<span class="badge">${score}</span>`);
+}
 
-const updateStatusElement = (elem, display, color, innerHTML) => {
+function updateStatusElement(elem, display, color, innerHTML) {
     elem.style.display = display;
 
     if (arguments.length > 2) {
         elem.style.color = color;
         elem.innerHTML = innerHTML;
     }
-};
+}
 
-const outputChoiceFeedBack = (hit) => {
+function outputChoiceFeedBack(hit) {
     if (hit) {
         updateStatusElement(currentGameStatusElem, "block", winColor, "Hit!! - Well Done!! :)");
     } else {
         updateStatusElement(currentGameStatusElem, "block", loseColor, "Missed!! :(");
     }
-};
+}
 
-const evaluateCardChoice = (card) => {
+function evaluateCardChoice(card) {
     if (card.id === aceId) {
         updateScore();
         outputChoiceFeedBack(true);
     } else {
         outputChoiceFeedBack(false);
     }
-};
+}
 
-const canChooseCard = () => {
+function canChooseCard() {
     return gameInProgress === true && !shufflingInProgress && !cardsRevealed;
-};
+}
 
-const initializeNewGame = () => {
+function initializeNewGame() {
     score = 0;
     roundNum = 0;
     shufflingInProgress = false;
@@ -128,10 +153,10 @@ const initializeNewGame = () => {
     updateStatusElement(scoreContainerElem, "flex");
     updateStatusElement(roundContainerElem, "flex");
     updateStatusElement(scoreElem, "block", primaryColor, `Score <span class='badge'>${score}</span>`);
-    updateStatusElement(roundElem, "block", primaryColor, `Score <span class='badge'>${round}</span>`);
-};
+    updateStatusElement(roundElem, "block", primaryColor, `Round <span class='badge'>${roundNum}</span>`);
+}
 
-const initializeNewRound = () => {
+function initializeNewRound() {
     roundNum++;
     playGameButtonElem.disabled = true;
     gameInProgress = true;
@@ -139,76 +164,77 @@ const initializeNewRound = () => {
     cardsRevealed = false;
 
     updateStatusElement(currentGameStatusElem, "block", primaryColor, "Shuffling...");
-    updateStatusElement(roundElem, "block", primaryColor, `Score <span class='badge'>${round}</span>`);
-};
+    updateStatusElement(roundElem, "block", primaryColor, `Round <span class='badge'>${roundNum}</span>`);
+}
 
-const startGame = () => {
+function startGame() {
     initializeNewGame();
     startRound();
-};
+}
 
-const startRound = () => {
+function startRound() {
     initializeNewRound();
     collectionCards();
     flipCards(true);
     shuffleCards();
-};
+}
 
-const collectionCards = () => {
+function collectionCards() {
     transformGridArea(collapsedGridAreaTemplate);
     addCardsToGridAreaCell(cardCollectionCellClass);
-};
+}
 
-const transformGridArea = (areas) => {
+function transformGridArea(areas) {
     cardContainerElem.style.gridTemplateAreas = areas;
-};
+}
 
-const addCardsToGridAreaCell = (cellPositionClassName) => {
+function addCardsToGridAreaCell(cellPositionClassName) {
     const cellPositionElem = document.querySelector(cellPositionClassName);
 
     cards.forEach((card) => {
         addChildElement(cellPositionElem, card);
     });
-};
+}
 
-const shuffleCards = () => {
+function shuffleCards() {
     let shuffleCount = 0;
     const shuffle = () => {
         randomizeCardPositions();
 
         if (shuffleCount === 500) {
             clearInterval(id);
+            shufflingInProgress = false;
             dealCard();
+            updateStatusElement(currentGameStatusElem, "block", primaryColor, "Please click the card that you think is the Ace of Spades...");
         } else {
             shuffleCount++;
         }
     };
     const id = setInterval(shuffle, 12);
-};
+}
 
-const randomizeCardPositions = () => {
+function randomizeCardPositions() {
     const random1 = Math.floor(Math.random() * numCards) + 1;
     const random2 = Math.floor(Math.random() * numCards) + 1;
     const temp = cardPositions[random1 - 1];
 
     cardPositions[random1 - 1] = cardPositions[random2 - 1];
     cardPositions[random2 - 1] = temp;
-};
+}
 
-const dealCard = () => {
+function dealCard() {
     addCardsToAppropriateCell();
 
     const areasTemplate = returnGridAreaMappedToCardPos();
     transformGridArea(areasTemplate);
-};
+}
 
-const returnGridAreaMappedToCardPos = () => {
+function returnGridAreaMappedToCardPos() {
     let firstPart = "";
     let secondPart = "";
     let areas = "";
 
     cards.forEach((card, index) => {
-        console.log(cardPositions[index]);
         switch (cardPositions[index]) {
             case "1":
                 areas += "a ";
@@ -233,43 +259,47 @@ const returnGridAreaMappedToCardPos = () => {
     });
 
     return `"${firstPart}" "${secondPart}"`;
-};
+}
 
-const addCardsToAppropriateCell = () => {
+function addCardsToAppropriateCell() {
     cards.forEach((card) => {
         addCardToGridCell(card);
     });
-};
+}
 
-const flipCard = (card, flipToBack) => {
+function flipCard(card, flipToBack) {
     const innerCardElem = card.firstChild;
-    console.log(innerCardElem);
+
     if (flipToBack && !innerCardElem.classList.contains("flip-it")) {
         innerCardElem.classList.add("flip-it");
     } else if (innerCardElem.classList.contains("flip-it")) {
         innerCardElem.classList.remove("flip-it");
     }
-};
+}
 
-const flipCards = (flipToBack) => {
+function flipCards(flipToBack) {
     cards.forEach((card, index) => {
         setTimeout(() => {
             flipCard(card, flipToBack);
         }, index * 100);
     });
-};
+}
 
-const createCards = () => {
+function createCards() {
     cardObjectDefinitions.forEach((cardItem) => {
         createCard(cardItem);
     });
-};
+}
 
-const initializeCardPositions = (card) => {
+function attachClickEventHandlerToCard(card) {
+    card.addEventListener("click", () => chooseCard(card));
+}
+
+function initializeCardPositions(card) {
     cardPositions.push(card.id);
-};
+}
 
-const createCard = (cardItem) => {
+function createCard(cardItem) {
     const cardElem = createElement("div");
     const cardInnerElem = createElement("div");
     const cardFrontElem = createElement("div");
@@ -301,36 +331,37 @@ const createCard = (cardItem) => {
 
     addCardToGridCell(cardElem);
     initializeCardPositions(cardElem);
-};
+    attachClickEventHandlerToCard(cardElem);
+}
 
-const createElement = (elemType) => {
+function createElement(elemType) {
     return document.createElement(elemType);
-};
+}
 
-const addClassToElement = (elem, className) => {
+function addClassToElement(elem, className) {
     elem.classList.add(className);
-};
+}
 
-const addIdToElement = (elem, id) => {
+function addIdToElement(elem, id) {
     elem.id = id;
-};
+}
 
-const addSrcToImageElement = (imgElem, src) => {
+function addSrcToImageElement(imgElem, src) {
     imgElem.src = src;
-};
+}
 
-const addChildElement = (parentElem, childElem) => {
+function addChildElement(parentElem, childElem) {
     parentElem.appendChild(childElem);
-};
+}
 
-const addCardToGridCell = (card) => {
+function addCardToGridCell(card) {
     const cardPositionClassName = mapCardIdToGridCell(card);
     const cardPosElem = document.querySelector(cardPositionClassName);
 
     addChildElement(cardPosElem, card);
-};
+}
 
-const mapCardIdToGridCell = (card) => {
+function mapCardIdToGridCell(card) {
     switch (card.id) {
         case "1":
             return ".card-pos-a";
@@ -341,7 +372,7 @@ const mapCardIdToGridCell = (card) => {
         case "4":
             return ".card-pos-d";
     }
-};
+}
 
 // initialize
 loadGame();
