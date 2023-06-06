@@ -3,6 +3,10 @@
     --card-height: 220px;
     --num-cards: 4;
     --card-horizontal-space: 100px;
+
+    --badge-bg-color: darkgrey;
+    --primary-color: black;
+    --secondary-color: #ffffff;
 }
 
 body {
@@ -56,6 +60,7 @@ main {
     position: absolute;
     height: var(--card-height);
     width: var(--card-width);
+    transition: transform 0.6s ease-in-out;
 }
 
 .card-inner {
@@ -84,10 +89,66 @@ main {
     transform: rotateY(180deg);
 }
 
-.card:hover .card-inner {
+.card-inner.flip-it {
     transform: rotateY(180deg);
 }
 
-.card-inner.flip-it {
-    transform: rotateY(180deg);
+header {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 10px;
+}
+
+.header-title-container {
+    display: flex;
+    justify-content: center;
+}
+
+.header-round-info-container {
+    display: flex;
+    justify-content: space-evenly;
+}
+
+.header-status-info-container,
+.header-button-container,
+.header-score-container,
+.header-round-container,
+.header-img-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.header-score-container,
+.header-round-container,
+.header-img-container {
+    width: 150px;
+}
+
+.header-img {
+    height: 75px;
+    border-radius: 5px;
+    border: 1px solid black;
+    padding: 5px;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+    transform: rotate(-3deg);
+}
+
+.badge {
+    background-color: var(--badge-bg-color);
+    color: var(--secondary-color);
+    padding: 2px 10px 3px;
+    border-radius: 15px;
+}
+
+.card.shuffle-left {
+    transform: translateX(300px) translateY(40px);
+}
+
+.card.shuffle-right {
+    transform: translateX(-350px) translateY(-40px);
+}
+
+.card.fly-in {
+    transform: translateY(-1000px) translateX(-600px) rotate(45deg);
 }
